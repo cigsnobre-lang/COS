@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CIGS · Sistema de Gestão COS</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ve:#0d2210;--vs:#1a3a1a;--vm:#2d5a27;--vc:#4a7c3f;
+  --do:#c9a84c;--dc:#e8c97a;--be:#f5f0e8;--br:#fff;
+  --az:#1a2a3a;--err:#8a2020;--ok:#1a4a20;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#2a2a2a;font-family:'Crimson Pro',Georgia,serif;min-height:100vh;}
+
+/* ── HEADER ── */
+.header{background:var(--ve);padding:12px 20px;display:flex;align-items:center;gap:14px;border-bottom:2px solid var(--do);position:sticky;top:0;z-index:100;}
+.header svg{flex-shrink:0;}
+.header-info{flex:1;}
+.header-title{font-family:'Cinzel',serif;color:var(--do);font-size:15px;font-weight:700;letter-spacing:2px;}
+.header-sub{font-family:'Cinzel',serif;color:#4a7a44;font-size:8px;letter-spacing:3px;margin-top:2px;}
+.header-date{font-family:'Cinzel',serif;font-size:9px;color:#4a7a44;letter-spacing:1px;white-space:nowrap;}
+.header-status{display:flex;align-items:center;gap:6px;font-family:'Cinzel',serif;font-size:9px;color:#4a7a44;letter-spacing:1px;}
+.status-dot{width:7px;height:7px;border-radius:50%;background:#4a7a44;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.status-dot.online{background:#5ab87a;}
+
+/* ── TABS ── */
+.tabs{background:var(--vs);display:flex;overflow-x:auto;border-bottom:1px solid rgba(201,168,76,.2);}
+.tabs::-webkit-scrollbar{height:3px;}
+.tabs::-webkit-scrollbar-thumb{background:var(--do);opacity:.3;}
+.tab{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:#4a7a44;padding:11px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;flex-shrink:0;}
+.tab:hover{color:var(--dc);background:rgba(201,168,76,.05);}
+.tab.active{color:var(--do);border-bottom-color:var(--do);background:rgba(201,168,76,.08);}
+
+/* ── PANELS ── */
+.panels{padding:20px;max-width:1000px;margin:0 auto;}
+.panel{display:none;}
+.panel.active{display:block;}
+
+/* ── SECTION TITLE ── */
+.stit{font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:2px;color:var(--vs);border-bottom:1px solid #d0c8b0;padding-bottom:8px;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.stit span{font-size:9px;color:#999;font-weight:400;letter-spacing:1px;}
+
+/* ── FORMS ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
+.full{grid-column:span 2;}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}.full{grid-column:span 1;}}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:var(--vs);font-weight:600;}
+.field label .req{color:var(--err);}
+.field input,.field select,.field textarea{
+  font-family:'Crimson Pro',serif;font-size:13.5px;
+  border:1px solid #d0c8b0;padding:8px 11px;color:#2a2a2a;
+  background:var(--be);border-radius:3px;outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--do);}
+.field select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+.field textarea{resize:vertical;min-height:70px;}
+.field .err-msg{font-size:11px;color:var(--err);display:none;}
+.field.invalid input,.field.invalid select,.field.invalid textarea{border-color:var(--err);}
+.field.invalid .err-msg{display:block;}
+
+/* ── CURSOS ── */
+.cursos-box{background:var(--be);border:1px solid #d0c8b0;border-radius:3px;padding:10px;max-height:200px;overflow-y:auto;}
+.cursos-box::-webkit-scrollbar{width:4px;}
+.cursos-box::-webkit-scrollbar-thumb{background:var(--do);opacity:.5;}
+.cursos-grid-inner{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+@media(max-width:500px){.cursos-grid-inner{grid-template-columns:1fr;}}
+.curso-item{display:flex;align-items:center;gap:7px;padding:4px 6px;border-radius:2px;cursor:pointer;transition:background .12s;}
+.curso-item:hover{background:rgba(201,168,76,.12);}
+.curso-item input[type=checkbox]{accent-color:var(--do);width:13px;height:13px;cursor:pointer;flex-shrink:0;}
+.curso-item span{font-size:12.5px;color:#333;line-height:1.3;}
+.cursos-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;min-height:22px;}
+.ctag{background:var(--vs);color:var(--dc);border:1px solid rgba(201,168,76,.3);border-radius:2px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.5px;padding:2px 7px;}
+
+/* ── BUTTONS ── */
+.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px;}
+.btn{font-family:'Cinzel',serif;font-size:10px;letter-spacing:1.5px;padding:9px 20px;cursor:pointer;border-radius:3px;transition:all .15s;border:none;white-space:nowrap;}
+.btn-primary{background:var(--vs);color:var(--do);border:1px solid var(--do);}
+.btn-primary:hover{background:var(--vm);}
+.btn-secondary{background:#f0ece4;color:var(--vs);border:1px solid #c0b8a0;}
+.btn-secondary:hover{background:#e4e0d8;}
+.btn-danger{background:#3a1a1a;color:#e07060;border:1px solid #c07060;}
+.btn-danger:hover{background:#4a2020;}
+.btn-sm{font-size:9px;padding:5px 12px;letter-spacing:1px;}
+.btn-export{background:var(--az);color:#90c8e8;border:1px solid #4a7898;}
+.btn-export:hover{background:#243a4a;}
+
+/* ── ALERTS ── */
+.alert{padding:10px 14px;border-radius:3px;font-size:13px;margin-bottom:14px;animation:fadeIn .3s;}
+.alert-ok{background:var(--ok);border-left:3px solid #7ab87a;color:#d0f0d0;}
+.alert-err{background:#3a1a1a;border-left:3px solid #c07060;color:#f0c0b0;}
+.alert-info{background:var(--ve);border-left:3px solid var(--do);color:var(--be);}
+.alert-warn{background:#3a2a10;border-left:3px solid var(--do);color:#f0d0a0;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── TABLES ── */
+.tbl-wrap{overflow-x:auto;margin-top:10px;border-radius:3px;border:1px solid #d0c8b0;}
+table{width:100%;border-collapse:collapse;font-size:12.5px;}
+thead tr{background:var(--vs);}
+thead th{font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:1.5px;color:var(--do);padding:9px 11px;text-align:left;white-space:nowrap;}
+tbody tr{transition:background .1s;}
+tbody tr:nth-child(odd){background:var(--be);}
+tbody tr:nth-child(even){background:var(--br);}
+tbody tr:hover{background:#e8f5e0;}
+tbody td{padding:8px 11px;color:#2a2a2a;vertical-align:middle;}
+.tbl-empty{text-align:center;color:#999;font-style:italic;padding:24px!important;}
+
+/* ── BADGES ── */
+.badge{display:inline-block;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.8px;padding:2px 8px;border-radius:2px;white-space:nowrap;}
+.badge-ok{background:#1a3a20;color:#7ab87a;border:1px solid #7ab87a;}
+.badge-warn{background:#3a2a10;color:#c9a84c;border:1px solid #c9a84c;}
+.badge-err{background:#3a1a1a;color:#c07060;border:1px solid #c07060;}
+.badge-gray{background:#2a2a2a;color:#aaa;border:1px solid #666;}
+.badge-blue{background:var(--az);color:#90c8e8;border:1px solid #4a7898;}
+
+/* ── SUMMARY CARDS ── */
+.sumcards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+@media(max-width:500px){.sumcards{grid-template-columns:1fr 1fr;}}
+.sumcard{background:var(--be);border:1px solid #d0c8b0;border-radius:4px;padding:14px;text-align:center;}
+.sumcard-num{font-family:'Cinzel',serif;font-size:28px;font-weight:700;color:var(--vs);line-height:1;}
+.sumcard-label{font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:#888;margin-top:5px;}
+.sumcard.s-ok .sumcard-num{color:#3a8a3a;}
+.sumcard.s-warn .sumcard-num{color:#8a6010;}
+.sumcard.s-err .sumcard-num{color:#8a2020;}
+
+/* ── NOTA BUTTONS ── */
+.notas-group{display:flex;gap:6px;}
+.nota-btn{width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-weight:700;font-size:11px;font-family:'Cinzel',serif;cursor:pointer;border:2px solid transparent;transition:all .12s;}
+.nota-btn:hover{transform:scale(1.12);}
+.nota-btn.sel{box-shadow:0 0 0 2px var(--do);}
+.nA{background:#1a3a1a;color:var(--do);}
+.nB{background:#2d5a27;color:#fff;}
+.nC{background:#8a5a10;color:#fff;}
+.nR{background:#8a2020;color:#fff;}
+.crit-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #d0c8b0;}
+.crit-row:last-child{border-bottom:none;}
+.crit-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.8px;color:var(--vs);}
+.crit-sub{font-size:11px;color:#777;margin-top:2px;}
+.crit-pts{font-size:10px;color:var(--do);font-family:'Cinzel',serif;}
+
+/* ── PRESENÇA TABLE ── */
+.pres-sel{font-size:12px;padding:4px 8px;background:var(--be);border:1px solid #d0c8b0;border-radius:2px;font-family:'Crimson Pro',serif;cursor:pointer;}
+.pres-sel:focus{border-color:var(--do);outline:none;}
+.pres-just{font-size:12px;padding:4px 8px;width:140px;background:var(--be);border:1px solid #d0c8b0;border-radius:2px;font-family:'Crimson Pro',serif;}
+.pres-just:focus{border-color:var(--do);outline:none;}
+.pres-just:disabled{opacity:.4;cursor:not-allowed;}
+
+/* ── EXPAND ── */
+.expand-btn{background:none;border:none;color:var(--do);cursor:pointer;font-size:14px;padding:0 4px;line-height:1;}
+.detail-row{display:none;}
+.detail-row.open{display:table-row;}
+.detail-inner{font-size:12px;color:#444;line-height:1.8;padding:10px 14px;background:#f9f6ee;}
+.detail-inner strong{font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--vs);}
+
+/* ── INSTRUCAO ATIVA BANNER ── */
+.instrucao-ativa{background:var(--vs);border:1px solid var(--do);padding:10px 16px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.ia-label{font-family:'Cinzel',serif;font-size:9px;color:#4a7a44;letter-spacing:2px;}
+.ia-val{font-family:'Cinzel',serif;font-size:12px;color:var(--do);font-weight:600;}
+
+/* ── CONSOLIDADO ── */
+.pontos-bar{height:6px;background:#d0c8b0;border-radius:3px;overflow:hidden;margin-top:3px;}
+.pontos-fill{height:100%;border-radius:3px;transition:width .4s;}
+.pontos-fill.alto{background:#5ab87a;}
+.pontos-fill.medio{background:var(--do);}
+.pontos-fill.baixo{background:#c07060;}
+
+/* ── MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--br);border:1px solid var(--do);max-width:500px;width:90%;max-height:80vh;overflow-y:auto;border-radius:4px;}
+.modal-head{background:var(--ve);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--do);}
+.modal-title{font-family:'Cinzel',serif;color:var(--do);font-size:12px;font-weight:700;letter-spacing:1px;}
+.modal-close{background:none;border:none;color:var(--do);font-size:18px;cursor:pointer;line-height:1;}
+.modal-body{padding:18px;}
+
+/* ── SYNC STATUS ── */
+.sync-info{font-family:'Cinzel',serif;font-size:9px;color:#4a7a44;letter-spacing:1px;margin-top:6px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <svg width="36" height="43" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
+    <defs><clipPath id="hc"><path d="M100 8 L185 38 L185 128 Q185 195 100 222 Q15 195 15 128 L15 38 Z"/></clipPath></defs>
+    <path d="M100 8 L185 38 L185 128 Q185 195 100 222 Q15 195 15 128 L15 38 Z" fill="#1a3a1a"/>
+    <rect x="15" y="82" width="170" height="50" fill="#0d1f0d" clip-path="url(#hc)"/>
+    <path d="M100 8 L185 38 L185 128 Q185 195 100 222 Q15 195 15 128 L15 38 Z" fill="none" stroke="#c9a84c" stroke-width="3"/>
+    <line x1="15" y1="82" x2="185" y2="82" stroke="#c9a84c" stroke-width="1.5" clip-path="url(#hc)"/>
+    <line x1="15" y1="132" x2="185" y2="132" stroke="#c9a84c" stroke-width="1.5" clip-path="url(#hc)"/>
+    <g transform="translate(100,107)">
+      <ellipse cx="0" cy="0" rx="28" ry="25" fill="#d4a832"/>
+      <ellipse cx="0" cy="6" rx="16" ry="13" fill="#e8c870"/>
+      <ellipse cx="-10" cy="-7" rx="6" ry="5" fill="#f5f0e0"/><ellipse cx="10" cy="-7" rx="6" ry="5" fill="#f5f0e0"/>
+      <circle cx="-10" cy="-7" r="3.5" fill="#2a1500"/><circle cx="10" cy="-7" r="3.5" fill="#2a1500"/>
+      <path d="M-3,-1 Q0,-3 3,-1 Q1,3 0,4 Q-1,3 -3,-1 Z" fill="#8b3a2a"/>
+      <path d="M-6,8 Q0,13 6,8" stroke="#7a2a1a" stroke-width="1.3" fill="none"/>
+      <polygon points="-20,-20 -26,-35 -9,-18" fill="#d4a832"/><polygon points="20,-20 26,-35 9,-18" fill="#d4a832"/>
+    </g>
+    <g transform="translate(100,36)"><polygon points="0,-14 3,-5 12,-5 5,2 7,11 0,6 -7,11 -5,2 -12,-5 -3,-5" fill="#c9a84c"/></g>
+    <path d="M15 170 L185 170 L185 195 Q100 220 15 195 Z" fill="#0d1f0d" clip-path="url(#hc)"/>
+    <line x1="15" y1="170" x2="185" y2="170" stroke="#c9a84c" stroke-width="1.2" clip-path="url(#hc)"/>
+    <text x="100" y="192" fill="#c9a84c" font-family="Georgia,serif" font-size="12" font-weight="bold" text-anchor="middle" letter-spacing="5">CIGS</text>
+  </svg>
+  <div class="header-info">
+    <div class="header-title">CIGS · SISTEMA DE GESTÃO</div>
+    <div class="header-sub">CURSO DE OPERAÇÕES NA SELVA · 2026</div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+    <div class="header-date" id="hdate"></div>
+    <div class="header-status"><div class="status-dot online" id="statusDot"></div><span id="statusTxt">ATIVO</span></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="showTab('inscricao')">📋 INSCRIÇÃO</div>
+  <div class="tab" onclick="showTab('candidatos')">🪖 CANDIDATOS</div>
+  <div class="tab" onclick="showTab('presenca')">✅ PRESENÇA</div>
+  <div class="tab" onclick="showTab('avaliacao')">🎯 AVALIAÇÃO</div>
+  <div class="tab" onclick="showTab('consolidado')">📊 CONSOLIDADO</div>
+</div>
+
+<!-- PANELS -->
+<div class="panels">
+
+  <!-- ── INSCRIÇÃO ── -->
+  <div class="panel active" id="panel-inscricao">
+    <div class="stit">FICHA DE INSCRIÇÃO <span>CANDIDATO</span></div>
+    <div class="alert alert-info">Instrução: Preencha todos os campos obrigatórios. Sua inscrição será avaliada pelo comando antes da confirmação no curso.</div>
+    <div id="fb-inscricao"></div>
+    <div class="form-grid">
+      <div class="field full" id="fld-nome">
+        <label>Nome completo (in-game) <span class="req">*</span></label>
+        <input type="text" id="f-nome" placeholder="Ex: João da Silva"/>
+        <span class="err-msg">Campo obrigatório</span>
+      </div>
+      <div class="field" id="fld-patente">
+        <label>Patente atual <span class="req">*</span></label>
+        <select id="f-patente">
+          <option value="">Selecione...</option>
+          <option>Cabo</option><option>3º Sargento</option><option>2º Sargento</option>
+          <option>1º Sargento</option><option>Subtenente</option><option>Aspirante</option>
+          <option>2º Tenente</option><option>1º Tenente</option><option>Capitão</option><option>Major</option>
+        </select>
+        <span class="err-msg">Campo obrigatório</span>
+      </div>
+      <div class="field" id="fld-subdiv">
+        <label>Subdivisão <span class="req">*</span></label>
+        <select id="f-subdiv">
+          <option value="">Selecione...</option>
+          <option>Estado Maior</option><option>Exército Brasileiro</option><option>Financeiro</option>
+          <option>C.I.G.S</option><option>Comandos</option><option>Recrutadores</option>
+          <option>P.E</option><option>F.A.B</option><option>Outra</option>
+        </select>
+        <span class="err-msg">Campo obrigatório</span>
+      </div>
+      <div class="field" id="fld-tempo">
+        <label>Tempo de RP <span class="req">*</span></label>
+        <select id="f-tempo">
+          <option value="">Selecione...</option>
+          <option>Menos de 1 semana</option><option>1 a 4 semanas</option>
+          <option>1 a 3 meses</option><option>3 a 6 meses</option>
+          <option>6 meses a 1 ano</option><option>Mais de 1 ano</option>
+        </select>
+        <span class="err-msg">Campo obrigatório</span>
+      </div>
+      <div class="field" id="fld-tempoeb">
+        <label>Tempo no Exército <span class="req">*</span></label>
+        <select id="f-tempoeb">
+          <option value="">Selecione...</option>
+          <option>Menos de 1 semana</option><option>1 a 4 semanas</option>
+          <option>1 a 3 meses</option><option>Mais de 3 meses</option>
+        </select>
+        <span class="err-msg">Campo obrigatório</span>
+      </div>
+      <div class="field full" id="fld-disp">
+        <label>Disponibilidade de horários <span class="req">*</span></label>
+        <input type="text" id="f-disp" placeholder="Ex: Seg a Sex após 20h, fins de semana à tarde"/>
+        <span class="err-msg">Campo obrigatório</span>
+      </div>
+      <div class="field full">
+        <label>Cursos concluídos no EB <span class="req">*</span></label>
+        <div class="cursos-box"><div class="cursos-grid-inner" id="cursos-grid"></div></div>
+        <div class="cursos-tags" id="cursos-tags"><span style="font-size:11px;color:#999;font-style:italic;">Nenhum curso selecionado</span></div>
+      </div>
+      <div class="field full">
+        <label>Motivação / Observações <span style="color:#999;font-size:9px;">(opcional)</span></label>
+        <textarea id="f-obs" placeholder="Por que deseja participar do Curso de Operações na Selva?"></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="inscricaoSubmit()">✓ CONFIRMAR INSCRIÇÃO</button>
+      <button class="btn btn-secondary" onclick="limparForm()">✕ LIMPAR</button>
+    </div>
+  </div>
+
+  <!-- ── CANDIDATOS ── -->
+  <div class="panel" id="panel-candidatos">
+    <div class="stit">CANDIDATOS INSCRITOS <span id="total-cands-lbl">0 candidatos</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:flex-end;">
+      <div class="field" style="flex:1;min-width:200px;">
+        <label>INSTRUÇÃO / OPERAÇÃO ATIVA</label>
+        <select id="instrucao-ativa" onchange="setInstrucaoAtiva()">
+          <option value="">— Selecione a instrução ativa —</option>
+          <option>Instrução 1.1 — Posicionamento Tático (27/05)</option>
+          <option>Instrução 1.2 — Navegação sem Referências (29/05)</option>
+          <option>Operação de Fase 1 — Resistência e Evacuação (31/05)</option>
+          <option>Certificação de Meio — FAB e P.E. (06/06)</option>
+          <option>Instrução 2.1 — Táticas e Armamento (03/06)</option>
+          <option>Instrução 2.2 — Navegação Noturna e Rastreamento (05/06)</option>
+          <option>Operação de Fase 2 — Técnicas Integradas (07/06)</option>
+          <option>Operação 3.1 — Patrulha de Reconhecimento (10/06)</option>
+          <option>Operação 3.2 — Emboscada e Contra-Emboscada (12/06)</option>
+          <option>Operação Final — Inferno Verde (14/06)</option>
+        </select>
+      </div>
+      <button class="btn btn-export btn-sm" onclick="exportarCSV('candidatos')">⬇ EXPORTAR</button>
+    </div>
+    <div id="fb-candidatos"></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th></th><th>NOME</th><th>PATENTE</th><th>SUBDIVISÃO</th>
+          <th>TEMPO RP</th><th>NÍVEL</th><th>CURSOS</th><th>AÇÃO</th>
+        </tr></thead>
+        <tbody id="tbody-cands"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:10px;" class="sync-info" id="sync-cands"></div>
+  </div>
+
+  <!-- ── PRESENÇA ── -->
+  <div class="panel" id="panel-presenca">
+    <div class="stit">REGISTRO DE PRESENÇA <span>LIDERANÇA · ACESSO RESTRITO</span></div>
+    <div id="instrucao-ativa-banner" class="instrucao-ativa" style="display:none;">
+      <div><div class="ia-label">INSTRUÇÃO / OPERAÇÃO</div><div class="ia-val" id="ia-nome-pres">—</div></div>
+    </div>
+    <div class="alert alert-warn" id="pres-sem-instrucao">Selecione a instrução ativa na aba <strong>Candidatos</strong> antes de registrar presença.</div>
+    <div id="fb-presenca"></div>
+    <div class="form-grid" style="max-width:400px;">
+      <div class="field">
+        <label>Instrutor / Supervisor <span class="req">*</span></label>
+        <input type="text" id="p-instrutor" placeholder="Nome do instrutor"/>
+      </div>
+      <div class="field">
+        <label>Data e Horário</label>
+        <input type="datetime-local" id="p-data"/>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>NOME</th><th>PATENTE</th><th>PRESENÇA</th>
+          <th>JUSTIFICATIVA</th><th>AVISOU?</th>
+        </tr></thead>
+        <tbody id="tbody-pres"></tbody>
+      </table>
+    </div>
+    <div class="btn-row" style="margin-top:14px;">
+      <button class="btn btn-primary" onclick="salvarPresenca()">✓ SALVAR LISTA</button>
+      <button class="btn btn-export btn-sm" onclick="exportarCSV('presenca')">⬇ EXPORTAR</button>
+    </div>
+    <div id="sync-pres" class="sync-info"></div>
+  </div>
+
+  <!-- ── AVALIAÇÃO ── -->
+  <div class="panel" id="panel-avaliacao">
+    <div class="stit">AVALIAÇÃO DO CANDIDATO <span>LIDERANÇA · ACESSO RESTRITO</span></div>
+    <div id="fb-avaliacao"></div>
+    <div class="form-grid" style="max-width:600px;">
+      <div class="field" id="fld-av-cand">
+        <label>Candidato <span class="req">*</span></label>
+        <select id="av-candidato"><option value="">Selecione...</option></select>
+        <span class="err-msg">Selecione o candidato</span>
+      </div>
+      <div class="field" id="fld-av-inst">
+        <label>Instrutor <span class="req">*</span></label>
+        <input type="text" id="av-instrutor" placeholder="Nome do instrutor"/>
+        <span class="err-msg">Campo obrigatório</span>
+      </div>
+      <div class="field full" id="fld-av-instr">
+        <label>Instrução / Operação <span class="req">*</span></label>
+        <select id="av-instrucao">
+          <option value="">Selecione...</option>
+          <option>Instrução 1.1 — Posicionamento Tático</option>
+          <option>Instrução 1.2 — Navegação sem Referências</option>
+          <option>Operação de Fase 1 — Resistência e Evacuação</option>
+          <option>Instrução 2.1 — Táticas e Armamento</option>
+          <option>Instrução 2.2 — Navegação Noturna e Rastreamento</option>
+          <option>Operação de Fase 2 — Técnicas Integradas</option>
+          <option>Operação 3.1 — Patrulha de Reconhecimento</option>
+          <option>Operação 3.2 — Emboscada e Contra-Emboscada</option>
+          <option>Operação Final — Inferno Verde</option>
+        </select>
+        <span class="err-msg">Campo obrigatório</span>
+      </div>
+    </div>
+    <div style="background:var(--be);border:1px solid #d0c8b0;border-radius:3px;padding:14px;margin-bottom:14px;">
+      <div class="crit-row">
+        <div><div class="crit-label">COMUNICAÇÃO</div><div class="crit-sub">Código de rádio, mensagens curtas, disciplina de silêncio</div><div class="crit-pts">Peso: 20 pts</div></div>
+        <div class="notas-group">
+          <div class="nota-btn nA" onclick="setNota('com','A',this)" title="A — Excelente (20 pts)">A</div>
+          <div class="nota-btn nB" onclick="setNota('com','B',this)" title="B — Bom (15 pts)">B</div>
+          <div class="nota-btn nC" onclick="setNota('com','C',this)" title="C — Regular (10 pts)">C</div>
+          <div class="nota-btn nR" onclick="setNota('com','R',this)" title="R — Reprovado (0 pts)">R</div>
+        </div>
+      </div>
+      <div class="crit-row">
+        <div><div class="crit-label">TÉCNICA TÁTICA</div><div class="crit-sub">Formações, posicionamento, cobertura, navegação, táticas</div><div class="crit-pts">Peso: 25 pts</div></div>
+        <div class="notas-group">
+          <div class="nota-btn nA" onclick="setNota('tat','A',this)">A</div>
+          <div class="nota-btn nB" onclick="setNota('tat','B',this)">B</div>
+          <div class="nota-btn nC" onclick="setNota('tat','C',this)">C</div>
+          <div class="nota-btn nR" onclick="setNota('tat','R',this)">R</div>
+        </div>
+      </div>
+      <div class="crit-row">
+        <div><div class="crit-label">RESISTÊNCIA PSICOLÓGICA</div><div class="crit-sub">Foco sob pressão, controle emocional, eventos inesperados</div><div class="crit-pts">Peso: 20 pts</div></div>
+        <div class="notas-group">
+          <div class="nota-btn nA" onclick="setNota('res','A',this)">A</div>
+          <div class="nota-btn nB" onclick="setNota('res','B',this)">B</div>
+          <div class="nota-btn nC" onclick="setNota('res','C',this)">C</div>
+          <div class="nota-btn nR" onclick="setNota('res','R',this)">R</div>
+        </div>
+      </div>
+      <div class="crit-row">
+        <div><div class="crit-label">TRABALHO EM EQUIPE</div><div class="crit-sub">Cobertura mútua, não abandonar membro, apoio espontâneo</div><div class="crit-pts">Peso: 20 pts</div></div>
+        <div class="notas-group">
+          <div class="nota-btn nA" onclick="setNota('eqp','A',this)">A</div>
+          <div class="nota-btn nB" onclick="setNota('eqp','B',this)">B</div>
+          <div class="nota-btn nC" onclick="setNota('eqp','C',this)">C</div>
+          <div class="nota-btn nR" onclick="setNota('eqp','R',this)">R</div>
+        </div>
+      </div>
+      <div class="crit-row">
+        <div><div class="crit-label">LIDERANÇA</div><div class="crit-sub">Iniciativa sem designação, organizar equipe quando o plano quebra</div><div class="crit-pts">Peso: 15 pts · Bônus +10 disponível</div></div>
+        <div class="notas-group">
+          <div class="nota-btn nA" onclick="setNota('lid','A',this)">A</div>
+          <div class="nota-btn nB" onclick="setNota('lid','B',this)">B</div>
+          <div class="nota-btn nC" onclick="setNota('lid','C',this)">C</div>
+          <div class="nota-btn nR" onclick="setNota('lid','R',this)">R</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-grid" style="max-width:600px;">
+      <div class="field">
+        <label>Penalidades aplicadas</label>
+        <select id="av-penalidade">
+          <option value="0">Nenhuma penalidade</option>
+          <option value="-10">Mensagem fora do código (−10 pts)</option>
+          <option value="-25">Disparo não autorizado (−25 pts)</option>
+          <option value="-30">Abandono de membro (−30 pts)</option>
+          <option value="-35">Disparo + Abandono (−35 pts)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Bônus</label>
+        <select id="av-bonus">
+          <option value="0">Nenhum bônus</option>
+          <option value="10">Decisão que salvou a equipe (+10 pts)</option>
+        </select>
+      </div>
+      <div class="field full">
+        <label>Observações do Instrutor <span style="color:#999;font-size:9px;">(opcional)</span></label>
+        <textarea id="av-obs" placeholder="Comportamento específico, especialização natural identificada..."></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="salvarAvaliacao()">✓ SALVAR AVALIAÇÃO</button>
+    </div>
+    <div id="sync-av" class="sync-info"></div>
+  </div>
+
+  <!-- ── CONSOLIDADO ── -->
+  <div class="panel" id="panel-consolidado">
+    <div class="stit">RELATÓRIO CONSOLIDADO <span>DIRETORIA · ACESSO RESTRITO</span></div>
+    <div class="sumcards">
+      <div class="sumcard"><div class="sumcard-num" id="s-total">0</div><div class="sumcard-label">INSCRITOS</div></div>
+      <div class="sumcard"><div class="sumcard-num" id="s-avals">0</div><div class="sumcard-label">AVALIAÇÕES</div></div>
+      <div class="sumcard"><div class="sumcard-num" id="s-presencas">0</div><div class="sumcard-label">PRESENÇAS</div></div>
+      <div class="sumcard s-ok"><div class="sumcard-num" id="s-alto">0</div><div class="sumcard-label">DESEMPENHO ALTO</div></div>
+      <div class="sumcard s-warn"><div class="sumcard-num" id="s-medio">0</div><div class="sumcard-label">DESEMPENHO MÉDIO</div></div>
+      <div class="sumcard s-err"><div class="sumcard-num" id="s-baixo">0</div><div class="sumcard-label">DESEMPENHO BAIXO</div></div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:flex-end;">
+      <div class="field" style="flex:1;min-width:200px;">
+        <label>FILTRAR POR INSTRUÇÃO</label>
+        <select id="filtro-instrucao" onchange="atualizarConsolidado()">
+          <option value="">Todas as instruções</option>
+          <option>Instrução 1.1 — Posicionamento Tático</option>
+          <option>Instrução 1.2 — Navegação sem Referências</option>
+          <option>Operação de Fase 1 — Resistência e Evacuação</option>
+          <option>Instrução 2.1 — Táticas e Armamento</option>
+          <option>Instrução 2.2 — Navegação Noturna e Rastreamento</option>
+          <option>Operação de Fase 2 — Técnicas Integradas</option>
+          <option>Operação 3.1 — Patrulha de Reconhecimento</option>
+          <option>Operação 3.2 — Emboscada e Contra-Emboscada</option>
+          <option>Operação Final — Inferno Verde</option>
+        </select>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="atualizarConsolidado()">↻ ATUALIZAR</button>
+      <button class="btn btn-export btn-sm" onclick="exportarCSV('consolidado')">⬇ EXPORTAR</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>CANDIDATO</th><th>PATENTE</th>
+          <th>COM</th><th>TÁT</th><th>RES</th><th>EQP</th><th>LID</th>
+          <th>PONTUAÇÃO</th><th>NÍVEL</th><th>SITUAÇÃO</th>
+        </tr></thead>
+        <tbody id="tbody-consol"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div><!-- /panels -->
+
+<!-- MODAL DETALHE -->
+<div class="modal-bg" id="modal-bg" onclick="fecharModal(event)">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-title">DETALHE DO CANDIDATO</div>
+      <button class="modal-close" onclick="fecharModal()" title="Fechar">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DADOS (salvos no localStorage)
+// ═══════════════════════════════════════════════
+var DB = {
+  inscritos: [],
+  presencas: [],
+  avaliacoes: [],
+  instrucaoAtiva: ''
+};
+
+var notas = {com:null, tat:null, res:null, eqp:null, lid:null};
+
+// Carregar do localStorage ao iniciar
+function carregarDB() {
+  try {
+    var saved = localStorage.getItem('cigs_cos_2026');
+    if (saved) DB = JSON.parse(saved);
+  } catch(e) {}
+}
+
+function salvarDB() {
+  try {
+    localStorage.setItem('cigs_cos_2026', JSON.stringify(DB));
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════════════════
+// CURSOS
+// ═══════════════════════════════════════════════
+var CURSOS = [
+  {e:'📋', n:'AIM — Adaptação e Integração Militar'},
+  {e:'🔰', n:'Alinhamento e Postura Militar'},
+  {e:'🔰', n:'Apresentação e Identificação'},
+  {e:'📚', n:'Guarita'},
+  {e:'🎙', n:'Modulação'},
+  {e:'🚔', n:'Abordagem'},
+  {e:'🌏', n:'Geolocalização'},
+  {e:'🔫', n:'Ação e Tiro'},
+  {e:'🏃', n:'T.A.F 1'},
+  {e:'🏃', n:'T.A.F 2'},
+  {e:'🏃', n:'T.A.F 3'},
+  {e:'⛓', n:'Prisão'},
+  {e:'🪂', n:'Paraquedismo Básico'},
+  {e:'🪂', n:'PQD'},
+  {e:'🚓', n:'SPEED'},
+  {e:'🚔', n:'P.E'},
+  {e:'🏞️', n:'FAB'},
+  {e:'🔫', n:'Ações Pequenas'},
+  {e:'🔫', n:'Ações Grandes'},
+  {e:'🎖️', n:'Formação de Oficiais'},
+  {e:'🖥️', n:'Inteligência'},
+  {e:'⚓', n:'Marinha'},
+  {e:'⛰️', n:'Combatente em Montanha'},
+  {e:'🏊', n:'Mergulhador'},
+  {e:'📋', n:'Negociador'},
+  {e:'⚔', n:'C.I.G.S'}
+];
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  carregarDB();
+  // Data header
+  var now = new Date();
+  document.getElementById('hdate').textContent =
+    now.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric'}) + ' ' +
+    now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  // Data presença
+  document.getElementById('p-data').value = now.toISOString().slice(0,16);
+  // Cursos grid
+  var grid = document.getElementById('cursos-grid');
+  CURSOS.forEach(function(c, i) {
+    var div = document.createElement('div');
+    div.className = 'curso-item';
+    div.innerHTML = '<input type="checkbox" id="cc'+i+'" value="'+c.n+'"><span>'+c.e+' '+c.n+'</span>';
+    div.querySelector('input').addEventListener('change', atualizarTagsCursos);
+    grid.appendChild(div);
+  });
+  // instrução ativa
+  if (DB.instrucaoAtiva) {
+    document.getElementById('instrucao-ativa').value = DB.instrucaoAtiva;
+  }
+});
+
+// ═══════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════
+function showTab(t) {
+  var tabs = ['inscricao','candidatos','presenca','avaliacao','consolidado'];
+  tabs.forEach(function(id) {
+    document.getElementById('panel-'+id).classList.toggle('active', id===t);
+  });
+  document.querySelectorAll('.tab').forEach(function(el,i) {
+    el.classList.toggle('active', tabs[i]===t);
+  });
+  if (t==='candidatos') renderCandidatos();
+  if (t==='presenca') renderPresenca();
+  if (t==='avaliacao') renderAvSelect();
+  if (t==='consolidado') atualizarConsolidado();
+}
+
+// ═══════════════════════════════════════════════
+// INSCRIÇÃO
+// ═══════════════════════════════════════════════
+function atualizarTagsCursos() {
+  var sel = Array.from(document.querySelectorAll('#cursos-grid input:checked')).map(function(i){return i.value;});
+  var tags = document.getElementById('cursos-tags');
+  if (!sel.length) {
+    tags.innerHTML = '<span style="font-size:11px;color:#999;font-style:italic;">Nenhum curso selecionado</span>';
+    return;
+  }
+  tags.innerHTML = sel.map(function(s){return '<span class="ctag">'+s+'</span>';}).join('');
+}
+
+function getCursos() {
+  return Array.from(document.querySelectorAll('#cursos-grid input:checked')).map(function(i){return i.value;});
+}
+
+function validarCampo(id, fieldId) {
+  var el = document.getElementById(id);
+  var fld = document.getElementById(fieldId);
+  var val = el.value ? el.value.trim() : '';
+  if (!val) { fld.classList.add('invalid'); return false; }
+  fld.classList.remove('invalid'); return true;
+}
+
+function inscricaoSubmit() {
+  var ok = true;
+  ok = validarCampo('f-nome','fld-nome') && ok;
+  ok = validarCampo('f-patente','fld-patente') && ok;
+  ok = validarCampo('f-subdiv','fld-subdiv') && ok;
+  ok = validarCampo('f-tempo','fld-tempo') && ok;
+  ok = validarCampo('f-tempoeb','fld-tempoeb') && ok;
+  ok = validarCampo('f-disp','fld-disp') && ok;
+  if (!ok) {
+    showFeedback('fb-inscricao','err','Preencha todos os campos obrigatórios (marcados com *).');
+    return;
+  }
+  var cand = {
+    id: Date.now(),
+    nome: document.getElementById('f-nome').value.trim(),
+    patente: document.getElementById('f-patente').value,
+    subdiv: document.getElementById('f-subdiv').value,
+    tempo: document.getElementById('f-tempo').value,
+    tempoeb: document.getElementById('f-tempoeb').value,
+    disp: document.getElementById('f-disp').value.trim(),
+    cursos: getCursos(),
+    obs: document.getElementById('f-obs').value.trim(),
+    dataInscricao: new Date().toLocaleString('pt-BR')
+  };
+  DB.inscritos.push(cand);
+  salvarDB();
+  showFeedback('fb-inscricao','ok',
+    'Inscrição de <strong>'+cand.nome+'</strong> finalizada com sucesso. '+
+    'A mesma será avaliada pelo comando antes da confirmação no curso.',
+    true
+  );
+  limparForm();
+}
+
+function limparForm() {
+  ['f-nome','f-disp','f-obs'].forEach(function(id){document.getElementById(id).value='';});
+  ['f-patente','f-subdiv','f-tempo','f-tempoeb'].forEach(function(id){document.getElementById(id).selectedIndex=0;});
+  document.querySelectorAll('#cursos-grid input').forEach(function(i){i.checked=false;});
+  atualizarTagsCursos();
+  ['fld-nome','fld-patente','fld-subdiv','fld-tempo','fld-tempoeb','fld-disp'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('invalid');
+  });
+}
+
+// ═══════════════════════════════════════════════
+// CANDIDATOS
+// ═══════════════════════════════════════════════
+function setInstrucaoAtiva() {
+  DB.instrucaoAtiva = document.getElementById('instrucao-ativa').value;
+  salvarDB();
+  showFeedback('fb-candidatos','ok','Instrução ativa definida: <strong>'+DB.instrucaoAtiva+'</strong>');
+}
+
+function renderCandidatos() {
+  var tb = document.getElementById('tbody-cands');
+  var total = DB.inscritos.length;
+  document.getElementById('total-cands-lbl').textContent = total + (total===1?' candidato':' candidatos');
+  if (!total) {
+    tb.innerHTML = '<tr><td colspan="8" class="tbl-empty">Nenhum candidato inscrito ainda.</td></tr>';
+    return;
+  }
+  tb.innerHTML = DB.inscritos.map(function(c) {
+    var nivel = getNivel(c.tempo);
+    return '<tr>'+
+      '<td><button class="expand-btn" onclick="abrirModal('+c.id+')">👁</button></td>'+
+      '<td><strong>'+c.nome+'</strong></td>'+
+      '<td>'+c.patente+'</td>'+
+      '<td>'+c.subdiv+'</td>'+
+      '<td style="font-size:11px;">'+c.tempo+'</td>'+
+      '<td>'+nivelBadge(nivel)+'</td>'+
+      '<td><span class="badge badge-gray">'+c.cursos.length+' curso(s)</span></td>'+
+      '<td><button class="btn btn-danger btn-sm" onclick="excluirCandidato('+c.id+')">✕ EXCLUIR</button></td>'+
+      '</tr>';
+  }).join('');
+}
+
+function excluirCandidato(id) {
+  if (!confirm('Confirmar exclusão deste candidato? Esta ação não pode ser desfeita.')) return;
+  DB.inscritos = DB.inscritos.filter(function(c){return c.id!==id;});
+  salvarDB();
+  renderCandidatos();
+  showFeedback('fb-candidatos','warn','Candidato removido com sucesso.');
+}
+
+function abrirModal(id) {
+  var c = DB.inscritos.find(function(x){return x.id===id;});
+  if (!c) return;
+  document.getElementById('modal-title').textContent = c.nome + ' · ' + c.patente;
+  var avs = DB.avaliacoes.filter(function(a){return a.candidatoId===id;});
+  var pts = calcularPontos(id);
+  document.getElementById('modal-body').innerHTML =
+    '<div style="font-size:13px;line-height:1.9;color:#333;">'+
+    '<strong>Subdivisão:</strong> '+c.subdiv+'<br>'+
+    '<strong>Tempo de RP:</strong> '+c.tempo+'<br>'+
+    '<strong>Tempo no EB:</strong> '+c.tempoeb+'<br>'+
+    '<strong>Disponibilidade:</strong> '+c.disp+'<br>'+
+    '<strong>Inscrição:</strong> '+c.dataInscricao+'<br>'+
+    (c.obs ? '<strong>Motivação:</strong> '+c.obs+'<br>' : '')+
+    '<br><strong style="font-family:Cinzel,serif;font-size:9px;letter-spacing:1px;color:var(--vs);">CURSOS CONCLUÍDOS:</strong><br>'+
+    (c.cursos.length ? c.cursos.map(function(cu){return '<span class="ctag" style="margin:2px;">'+cu+'</span>';}).join('') : '<em>Nenhum</em>')+
+    '<br><br><strong style="font-family:Cinzel,serif;font-size:9px;letter-spacing:1px;color:var(--vs);">AVALIAÇÕES: '+avs.length+' · PONTUAÇÃO TOTAL: '+pts+'/700</strong>'+
+    '</div>';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function fecharModal(e) {
+  if (!e || e.target === document.getElementById('modal-bg')) {
+    document.getElementById('modal-bg').classList.remove('open');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// PRESENÇA
+// ═══════════════════════════════════════════════
+function renderPresenca() {
+  var tb = document.getElementById('tbody-pres');
+  var ia = DB.instrucaoAtiva;
+  var banner = document.getElementById('instrucao-ativa-banner');
+  var aviso = document.getElementById('pres-sem-instrucao');
+
+  if (!ia) {
+    banner.style.display = 'none';
+    aviso.style.display = 'block';
+    tb.innerHTML = '<tr><td colspan="5" class="tbl-empty">Selecione a instrução ativa na aba Candidatos.</td></tr>';
+    return;
+  }
+  banner.style.display = 'flex';
+  aviso.style.display = 'none';
+  document.getElementById('ia-nome-pres').textContent = ia;
+
+  if (!DB.inscritos.length) {
+    tb.innerHTML = '<tr><td colspan="5" class="tbl-empty">Nenhum candidato inscrito.</td></tr>';
+    return;
+  }
+  tb.innerHTML = DB.inscritos.map(function(c) {
+    return '<tr>'+
+      '<td><strong>'+c.nome+'</strong></td>'+
+      '<td>'+c.patente+'</td>'+
+      '<td><select class="pres-sel" data-id="'+c.id+'" onchange="toggleJust(this)">'+
+        '<option value="">—</option>'+
+        '<option>Presente</option><option>Falta</option><option>Condicional</option>'+
+      '</select></td>'+
+      '<td><input class="pres-just" data-id="'+c.id+'" type="text" placeholder="Justificativa se falta..." disabled/></td>'+
+      '<td><select class="pres-aviso" data-id="'+c.id+'" style="font-size:12px;padding:4px 6px;background:var(--be);border:1px solid #d0c8b0;border-radius:2px;">'+
+        '<option>—</option><option>Sim</option><option>Não</option>'+
+      '</select></td>'+
+      '</tr>';
+  }).join('');
+}
+
+function toggleJust(sel) {
+  var id = sel.getAttribute('data-id');
+  var just = document.querySelector('.pres-just[data-id="'+id+'"]');
+  if (just) {
+    just.disabled = sel.value !== 'Falta';
+    if (sel.value !== 'Falta') just.value = '';
+  }
+}
+
+function salvarPresenca() {
+  var ia = DB.instrucaoAtiva;
+  var instrutor = document.getElementById('p-instrutor').value.trim();
+  var data = document.getElementById('p-data').value;
+  if (!ia) { showFeedback('fb-presenca','err','Defina a instrução ativa primeiro.'); return; }
+  if (!instrutor) { showFeedback('fb-presenca','err','Informe o instrutor responsável.'); return; }
+  var count = 0;
+  document.querySelectorAll('#tbody-pres tr').forEach(function(row) {
+    var sel = row.querySelector('.pres-sel');
+    if (!sel || !sel.value || sel.value==='—') return;
+    var cid = parseInt(sel.getAttribute('data-id'));
+    var just = row.querySelector('.pres-just').value;
+    var aviso = row.querySelector('.pres-aviso').value;
+    var cand = DB.inscritos.find(function(c){return c.id===cid;});
+    if (cand) {
+      DB.presencas.push({
+        id: Date.now()+count,
+        candidatoId: cid,
+        nome: cand.nome,
+        patente: cand.patente,
+        instrucao: ia,
+        instrutor: instrutor,
+        data: data,
+        status: sel.value,
+        justificativa: just,
+        aviso: aviso
+      });
+      count++;
+    }
+  });
+  salvarDB();
+  if (count) {
+    showFeedback('fb-presenca','ok',count+' registro(s) de presença salvos para <strong>'+ia+'</strong>.<br><small>Veja a aba Consolidado para o resumo atualizado.</small>');
+  } else {
+    showFeedback('fb-presenca','warn','Nenhum status selecionado. Marque presente ou falta para cada candidato.');
+  }
+}
+
+// ═══════════════════════════════════════════════
+// AVALIAÇÃO
+// ═══════════════════════════════════════════════
+function renderAvSelect() {
+  var sel = document.getElementById('av-candidato');
+  sel.innerHTML = '<option value="">Selecione o candidato...</option>';
+  DB.inscritos.forEach(function(c) {
+    sel.innerHTML += '<option value="'+c.id+'">'+c.nome+' — '+c.patente+'</option>';
+  });
+  // Pré-selecionar instrução ativa
+  if (DB.instrucaoAtiva) {
+    var avInstr = document.getElementById('av-instrucao');
+    // Mapear instrução ativa para opção do select de avaliação
+    Array.from(avInstr.options).forEach(function(opt) {
+      if (DB.instrucaoAtiva.indexOf(opt.value.split(' —')[0]) !== -1 || 
+          opt.value === DB.instrucaoAtiva.replace(/ \(\d+\/\d+\)/,'')) {
+        avInstr.value = opt.value;
+      }
+    });
+  }
+}
+
+function setNota(crit, val, el) {
+  notas[crit] = val;
+  el.parentElement.querySelectorAll('.nota-btn').forEach(function(b){b.classList.remove('sel');});
+  el.classList.add('sel');
+}
+
+function salvarAvaliacao() {
+  var candId = parseInt(document.getElementById('av-candidato').value);
+  var instrutor = document.getElementById('av-instrutor').value.trim();
+  var instrucao = document.getElementById('av-instrucao').value;
+
+  var ok = true;
+  if (!candId) { document.getElementById('fld-av-cand').classList.add('invalid'); ok=false; }
+  else document.getElementById('fld-av-cand').classList.remove('invalid');
+  if (!instrutor) { document.getElementById('fld-av-inst').classList.add('invalid'); ok=false; }
+  else document.getElementById('fld-av-inst').classList.remove('invalid');
+  if (!instrucao) { document.getElementById('fld-av-instr').classList.add('invalid'); ok=false; }
+  else document.getElementById('fld-av-instr').classList.remove('invalid');
+
+  // Verificar notas
+  var notasFaltando = Object.keys(notas).filter(function(k){return notas[k]===null;});
+  if (notasFaltando.length > 0) {
+    showFeedback('fb-avaliacao','err','Selecione as notas para todos os critérios antes de salvar.');
+    ok = false;
+  }
+  if (!ok) return;
+
+  var cand = DB.inscritos.find(function(c){return c.id===candId;});
+  var pen = parseInt(document.getElementById('av-penalidade').value)||0;
+  var bon = parseInt(document.getElementById('av-bonus').value)||0;
+  var notasSnap = Object.assign({}, notas);
+  var Rs = Object.values(notasSnap).filter(function(v){return v==='R';}).length;
+  var situacao = Rs===0?'aprovado':Rs===1?'condicional':'reprovado';
+
+  DB.avaliacoes.push({
+    id: Date.now(),
+    candidatoId: candId,
+    nome: cand ? cand.nome : '?',
+    patente: cand ? cand.patente : '?',
+    instrucao: instrucao,
+    instrutor: instrutor,
+    notas: notasSnap,
+    penalidade: pen,
+    bonus: bon,
+    obs: document.getElementById('av-obs').value.trim(),
+    Rs: Rs,
+    situacao: situacao,
+    dataAvaliacao: new Date().toLocaleString('pt-BR')
+  });
+  salvarDB();
+
+  // Reset
+  notas = {com:null,tat:null,res:null,eqp:null,lid:null};
+  document.querySelectorAll('.nota-btn').forEach(function(b){b.classList.remove('sel');});
+  document.getElementById('av-obs').value='';
+  document.getElementById('av-penalidade').selectedIndex=0;
+  document.getElementById('av-bonus').selectedIndex=0;
+  document.getElementById('av-candidato').selectedIndex=0;
+
+  var sit = situacao==='aprovado'?'APROVADO ✅':situacao==='condicional'?'CONDICIONAL ⚠':' REPROVADO ❌';
+  showFeedback('fb-avaliacao','ok','Avaliação de <strong>'+(cand?cand.nome:'?')+'</strong> registrada → <strong>'+sit+'</strong>');
+}
+
+// ═══════════════════════════════════════════════
+// CONSOLIDADO
+// ═══════════════════════════════════════════════
+var PONTOS_MAPA = {
+  com:  {A:20,B:15,C:10,R:0},
+  tat:  {A:25,B:18,C:12,R:0},
+  res:  {A:20,B:15,C:10,R:0},
+  eqp:  {A:20,B:15,C:10,R:0},
+  lid:  {A:15,B:10,C:6, R:0}
+};
+
+function calcularPontos(candId) {
+  var avs = DB.avaliacoes.filter(function(a){return a.candidatoId===candId;});
+  var total = 0;
+  avs.forEach(function(a) {
+    Object.keys(PONTOS_MAPA).forEach(function(k) {
+      if (a.notas[k]) total += PONTOS_MAPA[k][a.notas[k]]||0;
+    });
+    total += (a.penalidade||0) + (a.bonus||0);
+  });
+  return Math.max(0, total);
+}
+
+function getNivelFaixa(pts, numAvals) {
+  if (numAvals===0) return 'sem-dados';
+  var max = numAvals * 100;
+  var pct = pts / max;
+  if (pct >= 0.80) return 'alto';
+  if (pct >= 0.60) return 'medio';
+  return 'baixo';
+}
+
+function atualizarConsolidado() {
+  var filtro = document.getElementById('filtro-instrucao').value;
+  var total = DB.inscritos.length;
+  var avals = filtro ? DB.avaliacoes.filter(function(a){return a.instrucao===filtro;}) : DB.avaliacoes;
+  var presencas = filtro ? DB.presencas.filter(function(p){return p.instrucao.indexOf(filtro)!==-1;}) : DB.presencas;
+
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-avals').textContent = avals.length;
+  document.getElementById('s-presencas').textContent = presencas.length;
+
+  var alto=0, medio=0, baixo=0;
+  var tb = document.getElementById('tbody-consol');
+
+  if (!total) {
+    tb.innerHTML = '<tr><td colspan="10" class="tbl-empty">Nenhum dado disponível.</td></tr>';
+    document.getElementById('s-alto').textContent='0';
+    document.getElementById('s-medio').textContent='0';
+    document.getElementById('s-baixo').textContent='0';
+    return;
+  }
+
+  tb.innerHTML = DB.inscritos.map(function(c) {
+    var avsCand = filtro
+      ? DB.avaliacoes.filter(function(a){return a.candidatoId===c.id && a.instrucao===filtro;})
+      : DB.avaliacoes.filter(function(a){return a.candidatoId===c.id;});
+    var last = avsCand[avsCand.length-1];
+    var pts = 0;
+    avsCand.forEach(function(a) {
+      Object.keys(PONTOS_MAPA).forEach(function(k){
+        if(a.notas[k]) pts += PONTOS_MAPA[k][a.notas[k]]||0;
+      });
+      pts += (a.penalidade||0) + (a.bonus||0);
+    });
+    pts = Math.max(0, pts);
+
+    var nivel = getNivelFaixa(pts, avsCand.length);
+    if (nivel==='alto') alto++;
+    else if (nivel==='medio') medio++;
+    else if (nivel==='baixo') baixo++;
+
+    var maxPts = avsCand.length * 100;
+    var pct = maxPts > 0 ? Math.round(pts/maxPts*100) : 0;
+    var fillClass = nivel==='alto'?'alto':nivel==='medio'?'medio':'baixo';
+
+    var crits = ['com','tat','res','eqp','lid'];
+    var notaCols = crits.map(function(k) {
+      var n = last ? last.notas[k] : null;
+      if (!n) return '<td style="color:#ccc;">—</td>';
+      var colors = {A:'#7ab87a',B:'#c9a84c',C:'#e0a040',R:'#c07060'};
+      return '<td style="font-family:Cinzel,serif;font-weight:700;font-size:11px;color:'+(colors[n]||'#333')+'">'+n+'</td>';
+    }).join('');
+
+    var sitBadge = avsCand.length===0
+      ? '<span class="badge badge-gray">SEM DADOS</span>'
+      : last && last.situacao==='aprovado'
+        ? '<span class="badge badge-ok">APROVADO</span>'
+        : last && last.situacao==='condicional'
+          ? '<span class="badge badge-warn">CONDICIONAL</span>'
+          : '<span class="badge badge-err">REPROVADO</span>';
+
+    var nivelBdg = nivel==='alto'
+      ? '<span class="badge badge-ok">ALTO</span>'
+      : nivel==='medio'
+        ? '<span class="badge badge-warn">MÉDIO</span>'
+        : nivel==='baixo'
+          ? '<span class="badge badge-err">BAIXO</span>'
+          : '<span class="badge badge-gray">—</span>';
+
+    return '<tr>'+
+      '<td><strong>'+c.nome+'</strong></td>'+
+      '<td>'+c.patente+'</td>'+
+      notaCols+
+      '<td><div style="font-family:Cinzel,serif;font-size:11px;font-weight:700;">'+pts+' pts</div>'+
+        '<div class="pontos-bar"><div class="pontos-fill '+fillClass+'" style="width:'+pct+'%"></div></div>'+
+        '<div style="font-size:10px;color:#999;">'+pct+'% ('+avsCand.length+' avals)</div></td>'+
+      '<td>'+nivelBdg+'</td>'+
+      '<td>'+sitBadge+'</td>'+
+      '</tr>';
+  }).join('');
+
+  document.getElementById('s-alto').textContent = alto;
+  document.getElementById('s-medio').textContent = medio;
+  document.getElementById('s-baixo').textContent = baixo;
+}
+
+// ═══════════════════════════════════════════════
+// EXPORTAR CSV
+// ═══════════════════════════════════════════════
+function exportarCSV(tipo) {
+  var rows = [], filename = '';
+  if (tipo==='candidatos') {
+    filename = 'CIGS_Candidatos_COS_2026.csv';
+    rows.push(['Nome','Patente','Subdivisão','Tempo RP','Tempo EB','Disponibilidade','Cursos','Observações','Data Inscrição']);
+    DB.inscritos.forEach(function(c) {
+      rows.push([c.nome,c.patente,c.subdiv,c.tempo,c.tempoeb,c.disp,c.cursos.join('|'),c.obs,c.dataInscricao]);
+    });
+  } else if (tipo==='presenca') {
+    filename = 'CIGS_Presenca_COS_2026.csv';
+    rows.push(['Nome','Patente','Instrução','Instrutor','Data','Presença','Justificativa','Avisou']);
+    DB.presencas.forEach(function(p) {
+      rows.push([p.nome,p.patente,p.instrucao,p.instrutor,p.data,p.status,p.justificativa,p.aviso]);
+    });
+  } else if (tipo==='consolidado') {
+    filename = 'CIGS_Consolidado_COS_2026.csv';
+    rows.push(['Nome','Patente','Subdivisão','COM','TÁT','RES','EQP','LID','Penalidade','Bônus','Pontuação Total','Situação']);
+    DB.inscritos.forEach(function(c) {
+      var avs = DB.avaliacoes.filter(function(a){return a.candidatoId===c.id;});
+      var last = avs[avs.length-1];
+      var pts = Math.max(0, calcularPontos(c.id));
+      rows.push([
+        c.nome, c.patente, c.subdiv,
+        last?last.notas.com:'—',
+        last?last.notas.tat:'—',
+        last?last.notas.res:'—',
+        last?last.notas.eqp:'—',
+        last?last.notas.lid:'—',
+        last?last.penalidade:0,
+        last?last.bonus:0,
+        pts,
+        last?last.situacao:'sem dados'
+      ]);
+    });
+  }
+  var csv = rows.map(function(r){
+    return r.map(function(v){return '"'+(v||'').toString().replace(/"/g,'""')+'"';}).join(',');
+  }).join('\n');
+  var blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════
+function showFeedback(id, tipo, msg, autoclose) {
+  var el = document.getElementById(id);
+  var cls = tipo==='ok'?'alert-ok':tipo==='err'?'alert-err':tipo==='warn'?'alert-warn':'alert-info';
+  el.innerHTML = '<div class="alert '+cls+'">'+msg+'</div>';
+  if (autoclose) setTimeout(function(){el.innerHTML='';}, 5000);
+}
+
+function getNivel(tempo) {
+  if (['Menos de 1 semana','1 a 4 semanas'].indexOf(tempo)!==-1) return 'iniciante';
+  if (['1 a 3 meses','3 a 6 meses'].indexOf(tempo)!==-1) return 'intermediario';
+  return 'experiente';
+}
+
+function nivelBadge(n) {
+  if (n==='iniciante') return '<span class="badge badge-warn">INICIANTE</span>';
+  if (n==='intermediario') return '<span class="badge badge-ok">INTERMEDIÁRIO</span>';
+  return '<span class="badge badge-blue">EXPERIENTE</span>';
+}
+</script>
+</body>
+</html>
