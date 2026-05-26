@@ -184,6 +184,9 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
             <option>1º Tenente</option>
             <option>Capitão</option>
             <option>Major</option>
+            <option>Tenente Coronel</option>
+            <option>Coronel</option>
+            <option>General</option>
           </select>
           <span class="err-msg">Selecione sua patente</span>
         </div>
@@ -243,10 +246,11 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
       </div>
 
       <!-- MOTIVAÇÃO -->
-      <div class="sep">MOTIVAÇÃO <span style="font-size:9px;color:#999;font-weight:400;letter-spacing:1px;">(opcional)</span></div>
-      <div class="field">
-        <label>Por que deseja participar do Curso de Operações na Selva?</label>
+      <div class="sep">MOTIVAÇÃO <span class="req">*</span></div>
+      <div class="field" id="fld-obs">
+        <label>Por que deseja participar do Curso de Operações na Selva? <span class="req">*</span></label>
         <textarea id="f-obs" placeholder="Conte sua motivação..."></textarea>
+        <span class="err-msg">Preencha sua motivação</span>
       </div>
 
       <!-- COMPROMISSO -->
@@ -288,16 +292,8 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
       </button>
     </div>
 
-    <!-- SUCESSO -->
-    <div class="success-screen" id="success-screen">
-      <div class="success-ico">🏅</div>
-      <div class="success-title">INSCRIÇÃO CONFIRMADA</div>
-      <div class="success-msg">
-        Sua inscrição foi finalizada com sucesso.<br>
-        A mesma será avaliada pelo comando antes da confirmação no curso.
-      </div>
-      <div class="success-grito">SELVA! — BRASIL! 🐆</div>
-    </div>
+    <!-- SUCESSO (mantido como fallback) -->
+    <div class="success-screen" id="success-screen" style="display:none;"></div>
 
   </div>
 </div>
@@ -401,6 +397,7 @@ function enviarInscricao() {
   ok = validar('f-subdiv',  'fld-subdiv')  && ok;
   ok = validar('f-tempo',   'fld-tempo')   && ok;
   ok = validar('f-tempoeb', 'fld-tempoeb') && ok;
+  ok = validar('f-obs',     'fld-obs')     && ok;
   ok = validarCompromisso()                && ok;
 
   if (!ok) {
@@ -457,10 +454,60 @@ function enviarInscricao() {
 }
 
 function mostrarSucesso() {
-  document.getElementById('form-section').style.display = 'none';
-  document.getElementById('success-screen').style.display = 'block';
+  // Mostrar modal
+  var modal = document.getElementById('modal-bg');
+  modal.style.display = 'flex';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function fecharModal() {
+  document.getElementById('modal-bg').style.display = 'none';
+  // Limpar formulário e dar refresh
+  document.getElementById('f-nome').value = '';
+  document.getElementById('f-patente').selectedIndex = 0;
+  document.getElementById('f-subdiv').selectedIndex = 0;
+  document.getElementById('f-tempo').selectedIndex = 0;
+  document.getElementById('f-tempoeb').selectedIndex = 0;
+  document.getElementById('f-obs').value = '';
+  document.querySelectorAll('#cursos-grid input').forEach(function(i){i.checked=false;});
+  document.getElementById('cursos-tags').innerHTML = '<span style="font-size:11.5px;color:#999;font-style:italic;">Nenhum curso selecionado</span>';
+  document.getElementById('comp-1').checked = false;
+  document.getElementById('comp-2').checked = false;
+  document.getElementById('comp-3').checked = false;
+  document.getElementById('fb-form').innerHTML = '';
+  // Reabilitar botão
+  var btn = document.getElementById('btn-enviar');
+  btn.disabled = false;
+  btn.innerHTML = '✓ CONFIRMAR INSCRIÇÃO';
+  // Remover classes de erro
+  ['fld-nome','fld-patente','fld-subdiv','fld-tempo','fld-tempoeb','fld-obs','fld-compromisso'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el) el.classList.remove('invalid');
+  });
   window.scrollTo({top:0, behavior:'smooth'});
 }
 </script>
+
+<!-- MODAL SUCESSO -->
+<div id="modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:999;align-items:center;justify-content:center;">
+  <div style="background:#fff;max-width:420px;width:90%;border-radius:4px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+    <div style="background:#0d2210;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid #c9a84c;">
+      <span style="font-family:'Cinzel',serif;color:#c9a84c;font-size:12px;font-weight:700;letter-spacing:2px;">INSCRIÇÃO CONFIRMADA</span>
+      <button onclick="fecharModal()" style="background:none;border:none;color:#c9a84c;font-size:20px;cursor:pointer;line-height:1;padding:0 4px;" title="Fechar">✕</button>
+    </div>
+    <div style="padding:28px 24px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:14px;">🏅</div>
+      <div style="font-family:'Cinzel',serif;color:#1a3a1a;font-size:14px;font-weight:700;letter-spacing:1px;margin-bottom:12px;">INSCRIÇÃO FINALIZADA COM SUCESSO</div>
+      <div style="font-size:14px;color:#444;line-height:1.8;margin-bottom:20px;">
+        Sua inscrição foi recebida.<br>
+        A mesma será avaliada pelo comando<br>antes da confirmação no curso.
+      </div>
+      <div style="font-family:'Cinzel',serif;color:#c9a84c;font-size:13px;font-weight:700;letter-spacing:4px;background:#0d2210;border:1px solid #c9a84c;padding:10px 20px;display:inline-block;margin-bottom:20px;">SELVA! — BRASIL! 🐆</div>
+      <br>
+      <button onclick="fecharModal()" style="background:#1a3a1a;color:#c9a84c;border:1px solid #c9a84c;font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;padding:11px 28px;cursor:pointer;border-radius:3px;width:100%;">✓ FECHAR E NOVA INSCRIÇÃO</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
