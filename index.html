@@ -6,26 +6,17 @@
 <title>CIGS · Inscrição COS 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet"/>
 <style>
-:root{
-  --ve:#0d2210;--vs:#1a3a1a;--vm:#2d5a27;--vc:#4a7c3f;
-  --do:#c9a84c;--dc:#e8c97a;--be:#f5f0e8;--br:#fff;
-}
+:root{--ve:#0d2210;--vs:#1a3a1a;--vm:#2d5a27;--do:#c9a84c;--dc:#e8c97a;--be:#f5f0e8;--br:#fff;}
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{width:100%;min-height:100vh;background:#2a2a28;}
 body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
 
-/* HEADER */
 .header{background:var(--ve);padding:16px 20px;display:flex;align-items:center;gap:14px;border-bottom:2px solid var(--do);}
 .header-info{flex:1;}
 .header-title{font-family:'Cinzel',serif;color:var(--do);font-size:16px;font-weight:700;letter-spacing:2px;}
 .header-sub{font-family:'Cinzel',serif;color:#4a7a44;font-size:9px;letter-spacing:3px;margin-top:3px;}
-@media(max-width:480px){
-  .header-title{font-size:13px;letter-spacing:1px;}
-  .header-sub{font-size:7px;letter-spacing:1.5px;}
-  .header svg{width:30px;height:36px;}
-}
+@media(max-width:480px){.header-title{font-size:13px;letter-spacing:1px;}.header-sub{font-size:7px;}.header svg{width:30px;height:36px;}}
 
-/* CARD */
 .card{background:var(--br);max-width:680px;margin:24px auto;border-radius:4px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.4);}
 .card-head{background:var(--vs);padding:16px 24px;border-bottom:1px solid rgba(201,168,76,.2);}
 .card-title{font-family:'Cinzel',serif;color:var(--do);font-size:12px;font-weight:700;letter-spacing:2px;}
@@ -33,13 +24,11 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
 .card-body{padding:24px;}
 @media(max-width:480px){.card{margin:12px;}.card-body{padding:16px;}}
 
-/* ALERT */
 .alert{padding:11px 14px;border-radius:3px;font-size:13.5px;margin-bottom:18px;line-height:1.6;}
 .alert-info{background:var(--ve);border-left:4px solid var(--do);color:var(--be);}
 .alert-ok{background:#1a4a20;border-left:4px solid #7ab87a;color:#d0f0d0;}
 .alert-err{background:#3a1a1a;border-left:4px solid #c07060;color:#f0c0b0;}
 
-/* FORM */
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
 .full{grid-column:span 2;}
 @media(max-width:520px){.form-grid{grid-template-columns:1fr;}.full{grid-column:span 1;}}
@@ -49,10 +38,9 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
 .field label .req{color:#c07060;margin-left:2px;}
 .field input,.field select,.field textarea{
   font-family:'Crimson Pro',serif;font-size:14px;
-  border:1px solid #c8c0b0;padding:9px 12px;
-  color:#2a2a2a;background:var(--be);border-radius:3px;
-  outline:none;transition:border-color .15s,box-shadow .15s;
-  width:100%;
+  border:1px solid #c8c0b0;padding:9px 12px;color:#2a2a2a;
+  background:var(--be);border-radius:3px;outline:none;
+  transition:border-color .15s,box-shadow .15s;width:100%;
 }
 .field input:focus,.field select:focus,.field textarea:focus{
   border-color:var(--do);box-shadow:0 0 0 3px rgba(201,168,76,.12);
@@ -68,41 +56,40 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
 .field.invalid input,.field.invalid select,.field.invalid textarea{border-color:#c07060;background:#fff8f6;}
 .field.invalid .err-msg{display:block;}
 
+.sep{font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--vs);border-bottom:1px solid #d0c8b0;padding-bottom:7px;margin:20px 0 14px;}
+
 /* CURSOS */
-.cursos-box{
-  background:var(--be);border:1px solid #c8c0b0;border-radius:3px;
-  padding:10px;max-height:220px;overflow-y:auto;
-}
+.cursos-box{background:var(--be);border:1px solid #c8c0b0;border-radius:3px;padding:10px;max-height:240px;overflow-y:auto;}
 .cursos-box::-webkit-scrollbar{width:4px;}
 .cursos-box::-webkit-scrollbar-thumb{background:rgba(201,168,76,.4);border-radius:2px;}
 .cursos-inner{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
 @media(max-width:400px){.cursos-inner{grid-template-columns:1fr;}}
-.curso-item{
-  display:flex;align-items:center;gap:8px;
-  padding:5px 7px;border-radius:2px;cursor:pointer;
-  transition:background .12s;
-}
+.curso-item{display:flex;align-items:center;gap:8px;padding:5px 7px;border-radius:2px;cursor:pointer;transition:background .12s;}
 .curso-item:hover{background:rgba(201,168,76,.1);}
-.curso-item input[type=checkbox]{
-  accent-color:var(--do);width:14px;height:14px;
-  cursor:pointer;flex-shrink:0;
-}
+.curso-item input[type=checkbox]{accent-color:var(--do);width:14px;height:14px;cursor:pointer;flex-shrink:0;}
 .curso-item span{font-size:12.5px;color:#333;line-height:1.3;user-select:none;}
 .cursos-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;min-height:22px;}
-.ctag{
-  background:var(--vs);color:var(--dc);
-  border:1px solid rgba(201,168,76,.3);border-radius:2px;
-  font-family:'Cinzel',serif;font-size:8px;letter-spacing:.5px;
-  padding:2px 8px;
-}
+.ctag{background:var(--vs);color:var(--dc);border:1px solid rgba(201,168,76,.3);border-radius:2px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:.5px;padding:2px 8px;}
 
-/* SEPARADOR */
-.sep{
-  font-family:'Cinzel',serif;font-size:9px;font-weight:700;
-  letter-spacing:2px;color:var(--vs);
-  border-bottom:1px solid #d0c8b0;
-  padding-bottom:7px;margin:20px 0 14px;
+/* COMPROMISSO */
+.compromisso-box{
+  background:#f0ece0;border:1px solid #c8c0b0;
+  border-radius:3px;padding:16px;margin-bottom:4px;
 }
+.compromisso-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:8px 0;border-bottom:1px solid #d8d0c0;
+}
+.compromisso-item:last-child{border-bottom:none;padding-bottom:0;}
+.compromisso-item input[type=checkbox]{
+  accent-color:var(--vs);width:16px;height:16px;
+  cursor:pointer;flex-shrink:0;margin-top:2px;
+}
+.compromisso-item label{
+  font-size:13px;color:#333;line-height:1.6;cursor:pointer;
+}
+.compromisso-item label strong{color:var(--vs);}
+.field.invalid .compromisso-box{border-color:#c07060;background:#fff8f6;}
 
 /* BOTÃO */
 .btn-submit{
@@ -110,49 +97,26 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
   border:1px solid var(--do);border-radius:3px;
   font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;
   font-weight:700;padding:14px;cursor:pointer;
-  transition:all .15s;margin-top:4px;
+  transition:all .15s;margin-top:8px;
 }
-.btn-submit:hover{background:var(--vm);}
+.btn-submit:hover:not(:disabled){background:var(--vm);}
 .btn-submit:disabled{opacity:.5;cursor:not-allowed;}
-.btn-submit.loading{background:var(--vm);}
 
 /* SUCESSO */
-.success-screen{
-  display:none;text-align:center;padding:32px 24px;
-}
+.success-screen{display:none;text-align:center;padding:32px 24px;}
 .success-ico{font-size:52px;margin-bottom:16px;}
-.success-title{
-  font-family:'Cinzel',serif;color:var(--vs);
-  font-size:16px;font-weight:700;letter-spacing:2px;margin-bottom:10px;
-}
+.success-title{font-family:'Cinzel',serif;color:var(--vs);font-size:16px;font-weight:700;letter-spacing:2px;margin-bottom:10px;}
 .success-msg{font-size:15px;color:#444;line-height:1.8;margin-bottom:18px;}
-.success-grito{
-  font-family:'Cinzel',serif;color:var(--do);
-  font-size:14px;font-weight:700;letter-spacing:4px;
-  background:var(--ve);border:1px solid var(--do);
-  padding:10px 20px;display:inline-block;margin-top:8px;
-}
+.success-grito{font-family:'Cinzel',serif;color:var(--do);font-size:14px;font-weight:700;letter-spacing:4px;background:var(--ve);border:1px solid var(--do);padding:10px 20px;display:inline-block;margin-top:8px;}
 
-/* FOOTER */
-.footer{
-  text-align:center;font-family:'Cinzel',serif;
-  font-size:9px;color:#666;letter-spacing:2px;
-  margin-top:20px;padding:0 20px;
-}
+.footer{text-align:center;font-family:'Cinzel',serif;font-size:9px;color:#666;letter-spacing:2px;margin-top:20px;padding:0 20px;}
 
-/* SPINNER */
-.spinner{
-  display:inline-block;width:14px;height:14px;
-  border:2px solid rgba(201,168,76,.3);
-  border-top-color:var(--do);border-radius:50%;
-  animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;
-}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(201,168,76,.3);border-top-color:var(--do);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
   <svg width="38" height="46" viewBox="0 0 200 240" xmlns="http://www.w3.org/2000/svg">
     <defs><clipPath id="hc"><path d="M100 8 L185 38 L185 128 Q185 195 100 222 Q15 195 15 128 L15 38 Z"/></clipPath></defs>
@@ -164,18 +128,14 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
     <g transform="translate(100,107)">
       <ellipse cx="0" cy="0" rx="28" ry="25" fill="#d4a832"/>
       <ellipse cx="0" cy="6" rx="16" ry="13" fill="#e8c870"/>
-      <ellipse cx="-10" cy="-7" rx="6" ry="5" fill="#f5f0e0"/>
-      <ellipse cx="10" cy="-7" rx="6" ry="5" fill="#f5f0e0"/>
-      <circle cx="-10" cy="-7" r="3.5" fill="#2a1500"/>
-      <circle cx="10" cy="-7" r="3.5" fill="#2a1500"/>
+      <ellipse cx="-10" cy="-7" rx="6" ry="5" fill="#f5f0e0"/><ellipse cx="10" cy="-7" rx="6" ry="5" fill="#f5f0e0"/>
+      <circle cx="-10" cy="-7" r="3.5" fill="#2a1500"/><circle cx="10" cy="-7" r="3.5" fill="#2a1500"/>
       <path d="M-3,-1 Q0,-3 3,-1 Q1,3 0,4 Q-1,3 -3,-1 Z" fill="#8b3a2a"/>
       <path d="M-6,8 Q0,13 6,8" stroke="#7a2a1a" stroke-width="1.3" fill="none"/>
       <polygon points="-20,-20 -26,-35 -9,-18" fill="#d4a832"/>
       <polygon points="20,-20 26,-35 9,-18" fill="#d4a832"/>
     </g>
-    <g transform="translate(100,36)">
-      <polygon points="0,-14 3,-5 12,-5 5,2 7,11 0,6 -7,11 -5,2 -12,-5 -3,-5" fill="#c9a84c"/>
-    </g>
+    <g transform="translate(100,36)"><polygon points="0,-14 3,-5 12,-5 5,2 7,11 0,6 -7,11 -5,2 -12,-5 -3,-5" fill="#c9a84c"/></g>
     <path d="M15 170 L185 170 L185 195 Q100 220 15 195 Z" fill="#0d1f0d" clip-path="url(#hc)"/>
     <line x1="15" y1="170" x2="185" y2="170" stroke="#c9a84c" stroke-width="1.2" clip-path="url(#hc)"/>
     <text x="100" y="192" fill="#c9a84c" font-family="Georgia,serif" font-size="12" font-weight="bold" text-anchor="middle" letter-spacing="5">CIGS</text>
@@ -186,7 +146,6 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
   </div>
 </div>
 
-<!-- CARD PRINCIPAL -->
 <div class="card">
   <div class="card-head">
     <div class="card-title">FICHA DE INSCRIÇÃO — TURMA INAUGURAL</div>
@@ -194,7 +153,6 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
   </div>
   <div class="card-body">
 
-    <!-- FORMULÁRIO -->
     <div id="form-section">
       <div class="alert alert-info">
         Instrução: Preencha todos os campos obrigatórios.
@@ -202,14 +160,16 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
       </div>
       <div id="fb-form"></div>
 
-      <!-- DADOS PESSOAIS -->
+      <!-- DADOS DO CANDIDATO -->
       <div class="sep">DADOS DO CANDIDATO</div>
       <div class="form-grid">
+
         <div class="field full" id="fld-nome">
           <label>Nome completo (in-game) <span class="req">*</span></label>
           <input type="text" id="f-nome" placeholder="Ex: João da Silva" autocomplete="off"/>
           <span class="err-msg">Preencha seu nome completo</span>
         </div>
+
         <div class="field" id="fld-patente">
           <label>Patente atual <span class="req">*</span></label>
           <select id="f-patente">
@@ -227,22 +187,22 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
           </select>
           <span class="err-msg">Selecione sua patente</span>
         </div>
+
         <div class="field" id="fld-subdiv">
           <label>Subdivisão <span class="req">*</span></label>
           <select id="f-subdiv">
             <option value="">Selecione...</option>
             <option>Estado Maior</option>
             <option>Exército Brasileiro</option>
-            <option>Financeiro</option>
             <option>C.I.G.S</option>
             <option>Comandos</option>
-            <option>Recrutadores</option>
             <option>P.E</option>
             <option>F.A.B</option>
             <option>Outra</option>
           </select>
           <span class="err-msg">Selecione sua subdivisão</span>
         </div>
+
         <div class="field" id="fld-tempo">
           <label>Tempo de RP <span class="req">*</span></label>
           <select id="f-tempo">
@@ -256,6 +216,7 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
           </select>
           <span class="err-msg">Selecione seu tempo de RP</span>
         </div>
+
         <div class="field" id="fld-tempoeb">
           <label>Tempo no Exército <span class="req">*</span></label>
           <select id="f-tempoeb">
@@ -267,17 +228,15 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
           </select>
           <span class="err-msg">Selecione seu tempo no EB</span>
         </div>
-        <div class="field full" id="fld-disp">
-          <label>Disponibilidade de horários <span class="req">*</span></label>
-          <input type="text" id="f-disp" placeholder="Ex: Seg a Sex após 20h, fins de semana à tarde"/>
-          <span class="err-msg">Informe sua disponibilidade</span>
-        </div>
+
       </div>
 
       <!-- CURSOS -->
-      <div class="sep">CURSOS CONCLUÍDOS NO EB <span style="font-size:9px;color:#999;font-weight:400;letter-spacing:1px;">(selecione todos que possui)</span></div>
+      <div class="sep">CURSOS CONCLUÍDOS <span style="font-size:9px;color:#999;font-weight:400;letter-spacing:1px;">(selecione todos que possui)</span></div>
       <div class="field">
-        <div class="cursos-box"><div class="cursos-inner" id="cursos-grid"></div></div>
+        <div class="cursos-box">
+          <div class="cursos-inner" id="cursos-grid"></div>
+        </div>
         <div class="cursos-tags" id="cursos-tags">
           <span style="font-size:11.5px;color:#999;font-style:italic;">Nenhum curso selecionado</span>
         </div>
@@ -290,12 +249,46 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
         <textarea id="f-obs" placeholder="Conte sua motivação..."></textarea>
       </div>
 
+      <!-- COMPROMISSO -->
+      <div class="sep">COMPROMISSO E CIÊNCIA <span class="req">*</span></div>
+      <div class="field" id="fld-compromisso">
+        <div class="compromisso-box">
+
+          <div class="compromisso-item">
+            <input type="checkbox" id="comp-1"/>
+            <label for="comp-1">
+              Estou ciente de que o curso possui <strong>datas e horários fixos</strong> e que
+              <strong>atrasos não serão tolerados.</strong> A ausência sem aviso prévio pode
+              resultar em desligamento do curso.
+            </label>
+          </div>
+
+          <div class="compromisso-item">
+            <input type="checkbox" id="comp-2"/>
+            <label for="comp-2">
+              Comprometo-me a <strong>estar presente em todas as instruções e operações</strong>
+              do curso. Em caso de impossibilidade, avisarei a liderança com antecedência.
+            </label>
+          </div>
+
+          <div class="compromisso-item">
+            <input type="checkbox" id="comp-3"/>
+            <label for="comp-3">
+              Compreendo que o <strong>Brevê da Cara da Onça não é dado — é conquistado.</strong>
+              Estou ciente das exigências do curso e aceito as regras de avaliação da CIGS.
+            </label>
+          </div>
+
+        </div>
+        <span class="err-msg">Você precisa marcar todos os itens acima para prosseguir</span>
+      </div>
+
       <button class="btn-submit" id="btn-enviar" onclick="enviarInscricao()">
         ✓ CONFIRMAR INSCRIÇÃO
       </button>
     </div>
 
-    <!-- TELA DE SUCESSO -->
+    <!-- SUCESSO -->
     <div class="success-screen" id="success-screen">
       <div class="success-ico">🏅</div>
       <div class="success-title">INSCRIÇÃO CONFIRMADA</div>
@@ -313,40 +306,28 @@ body{font-family:'Crimson Pro',Georgia,serif;padding-bottom:40px;}
 
 <script>
 // ═══════════════════════════════════════════════
-// CONFIGURAÇÃO — cole o link do Apps Script aqui
+// COLE O LINK DO APPS SCRIPT AQUI APÓS PUBLICAR
 // ═══════════════════════════════════════════════
-var SCRIPT_URL = ''; // <- COLE O LINK AQUI APÓS PUBLICAR O APPS SCRIPT
+var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxKiGRy_7vK_qQvzYQU2b4qqQZUTEtIY2W7J39oCFyW0kc9hIFbtuGQEwVytwHBzAI/exec';
 
 // ═══════════════════════════════════════════════
-// CURSOS
+// CURSOS — obrigatórios para Cabo + SPEED, PQD, FAB
 // ═══════════════════════════════════════════════
 var CURSOS = [
-  {e:'📋', n:'AIM — Adaptação e Integração Militar'},
-  {e:'🔰', n:'Alinhamento e Postura Militar'},
-  {e:'🔰', n:'Apresentação e Identificação'},
-  {e:'📚', n:'Guarita'},
-  {e:'🎙', n:'Modulação'},
-  {e:'🚔', n:'Abordagem'},
-  {e:'🌏', n:'Geolocalização'},
-  {e:'🔫', n:'Ação e Tiro'},
-  {e:'🏃', n:'T.A.F 1'},
-  {e:'🏃', n:'T.A.F 2'},
-  {e:'🏃', n:'T.A.F 3'},
-  {e:'⛓',  n:'Prisão'},
-  {e:'🪂', n:'Paraquedismo Básico'},
-  {e:'🪂', n:'PQD'},
-  {e:'🚓', n:'SPEED'},
-  {e:'🚔', n:'P.E'},
-  {e:'🏞️', n:'FAB'},
-  {e:'🔫', n:'Ações Pequenas'},
-  {e:'🔫', n:'Ações Grandes'},
-  {e:'🎖️', n:'Formação de Oficiais'},
-  {e:'🖥️', n:'Inteligência'},
-  {e:'⚓',  n:'Marinha'},
-  {e:'⛰️', n:'Combatente em Montanha'},
-  {e:'🏊', n:'Mergulhador'},
-  {e:'📋', n:'Negociador'},
-  {e:'⚔',  n:'C.I.G.S'}
+  // Obrigatórios para Cabo
+  {e:'📋', n:'AIM — Adaptação e Integração Militar', req:true},
+  {e:'🔰', n:'Alinhamento e Postura Militar',         req:true},
+  {e:'🔰', n:'Apresentação e Identificação',          req:true},
+  {e:'📚', n:'Guarita',                               req:true},
+  {e:'🎙', n:'Modulação',                             req:true},
+  {e:'🚔', n:'Abordagem',                             req:true},
+  {e:'🌏', n:'Geolocalização',                        req:true},
+  {e:'🔫', n:'Ação e Tiro',                           req:true},
+  {e:'🏃', n:'T.A.F 1',                              req:true},
+  // Certificações de meio
+  {e:'🚓', n:'SPEED',                                 req:false},
+  {e:'🪂', n:'PQD — Paraquedismo',                    req:false},
+  {e:'🏞️', n:'FAB',                                   req:false}
 ];
 
 // ═══════════════════════════════════════════════
@@ -357,11 +338,11 @@ document.addEventListener('DOMContentLoaded', function() {
   CURSOS.forEach(function(c, i) {
     var div = document.createElement('div');
     div.className = 'curso-item';
-    div.innerHTML = '<input type="checkbox" id="cc'+i+'" value="'+c.n+'"><span>'+c.e+' '+c.n+'</span>';
+    var label = c.n + (c.req ? '' : ' <span style="font-size:10px;color:#888;">(opcional)</span>');
+    div.innerHTML = '<input type="checkbox" id="cc'+i+'" value="'+c.n+'"><span>'+c.e+' '+label+'</span>';
     div.addEventListener('click', function(e) {
       if (e.target.tagName !== 'INPUT') {
-        var cb = div.querySelector('input');
-        cb.checked = !cb.checked;
+        div.querySelector('input').checked = !div.querySelector('input').checked;
         atualizarTags();
       } else {
         atualizarTags();
@@ -400,6 +381,16 @@ function validar(id, fieldId) {
   return true;
 }
 
+function validarCompromisso() {
+  var todos = document.getElementById('comp-1').checked &&
+              document.getElementById('comp-2').checked &&
+              document.getElementById('comp-3').checked;
+  var fld = document.getElementById('fld-compromisso');
+  if (!todos) { fld.classList.add('invalid'); return false; }
+  fld.classList.remove('invalid');
+  return true;
+}
+
 // ═══════════════════════════════════════════════
 // ENVIO
 // ═══════════════════════════════════════════════
@@ -410,38 +401,36 @@ function enviarInscricao() {
   ok = validar('f-subdiv',  'fld-subdiv')  && ok;
   ok = validar('f-tempo',   'fld-tempo')   && ok;
   ok = validar('f-tempoeb', 'fld-tempoeb') && ok;
-  ok = validar('f-disp',    'fld-disp')    && ok;
+  ok = validarCompromisso()                && ok;
 
   if (!ok) {
     document.getElementById('fb-form').innerHTML =
-      '<div class="alert alert-err">Preencha todos os campos obrigatórios antes de confirmar.</div>';
+      '<div class="alert alert-err">Preencha todos os campos obrigatórios e aceite os termos de compromisso.</div>';
     window.scrollTo({top:0, behavior:'smooth'});
     return;
   }
 
   var dados = {
-    action:    'inscrever',
-    nome:      document.getElementById('f-nome').value.trim(),
-    patente:   document.getElementById('f-patente').value,
-    subdiv:    document.getElementById('f-subdiv').value,
-    tempo:     document.getElementById('f-tempo').value,
-    tempoeb:   document.getElementById('f-tempoeb').value,
-    disp:      document.getElementById('f-disp').value.trim(),
-    cursos:    getCursos(),
-    obs:       document.getElementById('f-obs').value.trim()
+    action:   'inscrever',
+    nome:     document.getElementById('f-nome').value.trim(),
+    patente:  document.getElementById('f-patente').value,
+    subdiv:   document.getElementById('f-subdiv').value,
+    tempo:    document.getElementById('f-tempo').value,
+    tempoeb:  document.getElementById('f-tempoeb').value,
+    cursos:   getCursos(),
+    obs:      document.getElementById('f-obs').value.trim()
   };
 
   // Sem SCRIPT_URL — modo demonstração
   if (!SCRIPT_URL) {
-    mostrarSucesso(dados.nome);
+    mostrarSucesso();
     return;
   }
 
-  // Enviar para o Apps Script
   var btn = document.getElementById('btn-enviar');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span>ENVIANDO...';
-  document.getElementById('fb-form').innerHTML = 'https://script.google.com/macros/s/AKfycbwtNJ9229HnPBARwBfO5keSAnA_ETotzJTYs3I2e35UV2tWslAd5oghxTriuxMhzbyG/exec';
+  document.getElementById('fb-form').innerHTML = '';
 
   fetch(SCRIPT_URL, {
     method: 'POST',
@@ -451,7 +440,7 @@ function enviarInscricao() {
   .then(function(r){ return r.json(); })
   .then(function(r) {
     if (r && r.ok) {
-      mostrarSucesso(dados.nome);
+      mostrarSucesso();
     } else {
       btn.disabled = false;
       btn.innerHTML = '✓ CONFIRMAR INSCRIÇÃO';
@@ -467,7 +456,7 @@ function enviarInscricao() {
   });
 }
 
-function mostrarSucesso(nome) {
+function mostrarSucesso() {
   document.getElementById('form-section').style.display = 'none';
   document.getElementById('success-screen').style.display = 'block';
   window.scrollTo({top:0, behavior:'smooth'});
